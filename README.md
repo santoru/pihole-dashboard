@@ -4,6 +4,7 @@ Minimal and clean dashboard to visualize some stats of Pi-Hole with an E-Ink dis
 This is very useful if you keep a Pi Zero with Pi-Hole connected to your router and you want a clean dashboard to monitor its status.
 Additionally, I do not use static IP so if this ever change, I have an easy way to get the real time IP of the Raspberry.
 <p align="center">
+    <a href="https://pypi.org/project/pihole-dashboard/"><img alt="PyPI" src="https://img.shields.io/pypi/v/pihole-dashboard"></a>
     <a href="#"><img alt="Updated" src="https://img.shields.io/github/last-commit/santoru/pihole-dashboard?label=updated"></a>
     <a href="https://pi-hole.net/"><img alt="Powered-By" src="https://img.shields.io/badge/Powered--By-Pi--Hole-FF0000?logo=pi-hole"></a>
     <br/>
