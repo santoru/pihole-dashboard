@@ -1,0 +1,3 @@
+build/
+dist/
+pihole_dashboard.egg-info/
