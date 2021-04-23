@@ -42,7 +42,8 @@ You can check if the display is working by running the test example:
 cd e-Paper/RaspberryPi_JetsonNano/python/
 sudo python3 examples/epd_2in13_V2_test.py
 ```
-Remember that you need **root** access to control the display, so be sure to run the python example as root. 
+Remember that you need **root** access to control the display, so be sure to run the python example as root.\
+You also need to [enable the SPI interface](https://www.raspberrypi.org/documentation/hardware/raspberrypi/spi/README.md#software), otherwise the display connection will not work.
 
 The example will print several geometric objects on the screen if everything is working as expected, followed by a simple clock program that updates every second.
 If the example does not work, do not proceed further with the installation as this probably will not work either.
