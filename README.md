@@ -17,13 +17,14 @@ Additionally, I do not use static IP so if this ever change, I have an easy way 
 - <a href="https://pi-hole.net/">Pi-Hole</a> (I have v5.2.4 at the moment)
 
 ## Configuration
-The tool should run out of the box with standard installation of Pi-Hole. If you have a different setup probably the scripts should be adapted too.
-If your instance of Pi-Hole is running on a different port than 80, you should change it inside `pihole_dashboard/__init__.py`.
+The tool should run out of the box with standard installation of Pi-Hole. If you have a different setup probably the scripts should be adapted too.\
+If your instance of Pi-Hole is running on a different port than 80, you should change it inside `pihole_dashboard/__init__.py`.\
+The IP address is shown considering the `wlan0` interface, you can change this value from `pihole_dashboard/__init__.py`.
 
 ### WaveShare e-Paper dependency
 Making the E-Ink display work is not fully covered here, as it depends mostly on the display you use. As said before, I have the WaveShare's 2.13 inch E-Ink display, that has a nice detailed Wiki here: https://www.waveshare.com/wiki/2.13inch_e-Paper_HAT.
 
-You can find there the list of required dependencies for Python and how to run and test the provided examples.
+You can find on the above link the list of required dependencies for Python and how to run and test the provided examples.
 Just for reference, this is the list of dependencies that should be installed on a Raspberry Pi Zero to configure the display I have:
 ```
 sudo apt-get install python3-pip python3-pil python3-numpy
