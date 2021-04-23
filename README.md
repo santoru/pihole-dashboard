@@ -17,13 +17,14 @@ Additionally, I do not use static IP so if this ever change, I have an easy way 
 - <a href="https://pi-hole.net/">Pi-Hole</a> (I have v5.2.4 at the moment)
 
 ## Configuration
-The tool should run out of the box with standard installation of Pi-Hole. If you have a different setup probably the scripts should be adapted too.
-If your instance of Pi-Hole is running on a different port than 80, you should change it inside `pihole_dashboard/__init__.py`.
+The tool should run out of the box with standard installation of Pi-Hole. If you have a different setup probably the scripts should be adapted too.\
+If your instance of Pi-Hole is running on a different port than 80, you should change it inside `pihole_dashboard/__init__.py`.\
+The IP address is shown considering the `wlan0` interface, you can change this value from `pihole_dashboard/__init__.py`.
 
 ### WaveShare e-Paper dependency
 Making the E-Ink display work is not fully covered here, as it depends mostly on the display you use. As said before, I have the WaveShare's 2.13 inch E-Ink display, that has a nice detailed Wiki here: https://www.waveshare.com/wiki/2.13inch_e-Paper_HAT.
 
-You can find there the list of required dependencies for Python and how to run and test the provided examples.
+You can find on the above link the list of required dependencies for Python and how to run and test the provided examples.
 Just for reference, this is the list of dependencies that should be installed on a Raspberry Pi Zero to configure the display I have:
 ```
 sudo apt-get install python3-pip python3-pil python3-numpy
@@ -41,7 +42,8 @@ You can check if the display is working by running the test example:
 cd e-Paper/RaspberryPi_JetsonNano/python/
 sudo python3 examples/epd_2in13_V2_test.py
 ```
-Remember that you need **root** access to control the display, so be sure to run the python example as root. 
+Remember that you need **root** access to control the display, so be sure to run the python example as root.\
+You also need to [enable the SPI interface](https://www.raspberrypi.org/documentation/hardware/raspberrypi/spi/README.md#software), otherwise the display connection will not work.
 
 The example will print several geometric objects on the screen if everything is working as expected, followed by a simple clock program that updates every second.
 If the example does not work, do not proceed further with the installation as this probably will not work either.
