@@ -47,6 +47,14 @@ epd = epd2in13_V2.EPD()
 epd.init(epd.FULL_UPDATE)
 
 
+def valid_ip(address):
+    try:
+        socket.inet_aton(address)
+        return True
+    except:
+        return False
+
+
 def draw_dashboard(out_string=None):
 
     image = Image.new("1", (epd.height, epd.width), 255)
@@ -83,7 +91,7 @@ def update():
     unique_clients = r['unique_clients']
     ads_blocked_today = r['ads_blocked_today']
 
-    if "192.168" in ip:
+    if valid_ip(ip):
         ip_str = "[✓] IP of {}: {}".format(hostname, ip)
 
     cmd = "/usr/local/bin/pihole status"
