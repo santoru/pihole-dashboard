@@ -88,7 +88,7 @@ def update():
         ip_str = "[×] Can't connect to Wi-Fi"
         ip = ""
 
-    if not "unique_clients" in r:
+    if "unique_clients" not in r:
         output_string = "Error from API.\nRun pihole-dashboard-draw\nfor details."
         draw_dashboard(output_string)
         output_error = "API Response: {}".format(r)
