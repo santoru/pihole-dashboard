@@ -23,6 +23,7 @@ import urllib.request
 import json
 import os
 import sys
+import toml
 import hashlib
 import netifaces as ni
 from waveshare_epd import epd2in13_V2
@@ -31,13 +32,25 @@ from PIL import Image, ImageFont, ImageDraw
 if os.geteuid() != 0:
     sys.exit("You need root permissions to access E-Ink display, try running with sudo!")
 
-INTERFACE = ""
+INTERFACE = "wlan0"
 PIHOLE_PORT = 80
-PIHOLE_APITOKEN=""
+PIHOLE_APITOKEN = ""
+IS_ROTATED = 0
 
 OUTPUT_STRING = ""
 FILENAME = "/tmp/.pihole-dashboard-output"
 CONFIG_FILENAME = "/etc/pihole-dashboard/config.toml"
+
+# Read config file
+try:
+    CONFIG = toml.load(CONFIG_FILENAME, _dict=dict)
+    INTERFACE = CONFIG["interface"]
+    PIHOLE_PORT = CONFIG["pihole_port"]
+    PIHOLE_APITOKEN = CONFIG["pihole_api_token"]
+    IS_ROTATED = CONFIG["is_rotated"]
+except TomlDecodeError:
+    output_error = "Config can't be parsed! Please check config file."
+    sys.exit(output_error)
 
 hostname = socket.gethostname()
 font_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'font')
