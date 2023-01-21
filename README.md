@@ -17,9 +17,9 @@ Additionally, I do not use static IP so if this ever change, I have an easy way 
 - <a href="https://pi-hole.net/">Pi-Hole</a> (I have v5.2.4 at the moment)
 
 ## Configuration
-The tool should run out of the box with standard installation of Pi-Hole. If you have a different setup probably the scripts should be adapted too.\
-If your instance of Pi-Hole is running on a different port than 80, you should change it inside `pihole_dashboard/__init__.py`.\
-The IP address is shown considering the `wlan0` interface, you can change this value from `pihole_dashboard/__init__.py`.
+After set the webui api token, the tool should run out of the box with standard installation of Pi-Hole. If you have a different setup probably the scripts should be adapted too.\
+If your instance of Pi-Hole is running on a different port than 80, you should change it inside `/etc/pihole-dashboard/config.toml`.\
+The IP address is shown considering the `wlan0` interface, you can change this value from `/etc/pihole-dashboard/config.toml`.
 
 ### WaveShare e-Paper dependency
 Making the E-Ink display work is not fully covered here, as it depends mostly on the display you use. As said before, I have the WaveShare's 2.13 inch E-Ink display, that has a nice detailed Wiki here: https://www.waveshare.com/wiki/2.13inch_e-Paper_HAT.
