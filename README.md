@@ -66,8 +66,7 @@ git clone https://github.com/santoru/pihole-dashboard
 cd pihole-dashboard
 sudo pip3 install .
 ```
-Once installed, reboot the Raspberry Pi. The dashboard should appear few minutes after the reboot.
-
+Once installed, add API key in config file (at `/etc/pihole-dashboard/config.toml`), reboot the Raspberry Pi. The dashboard should appear few minutes after the reboot.
 ## Uninstall
 You can remove the tool anytime by running
 ```bash
