@@ -90,6 +90,8 @@ def draw_dashboard(out_string=None):
         draw.text((0, 0), out_string, font=font16, fill=0)
     draw.text((5, 106), version, font=font12, fill=1)
     draw.text((150, 106), time_string, font=font12, fill=1)
+    if (IS_ROTATED == 1):
+        image = image.rotate(180)
     epd.display(epd.getbuffer(image))
 
 

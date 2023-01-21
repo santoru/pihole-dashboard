@@ -12,5 +12,5 @@ pihole_port = 80
 # https://github.com/pi-hole/AdminLTE/issues/2467
 pihole_api_token = ""
 
-# [WIP] Rotate indicator, set 1 for 180 degrees rotation. Default is 0
+# Rotate indicator, set 1 for 180 degrees rotation. Default is 0
 is_rotated = 0
