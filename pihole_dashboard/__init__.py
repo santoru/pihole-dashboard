@@ -31,11 +31,13 @@ from PIL import Image, ImageFont, ImageDraw
 if os.geteuid() != 0:
     sys.exit("You need root permissions to access E-Ink display, try running with sudo!")
 
-INTERFACE = "wlan0"
+INTERFACE = ""
 PIHOLE_PORT = 80
+PIHOLE_APITOKEN=""
 
 OUTPUT_STRING = ""
 FILENAME = "/tmp/.pihole-dashboard-output"
+CONFIG_FILENAME = "/etc/pihole-dashboard/config.toml"
 
 hostname = socket.gethostname()
 font_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'font')
@@ -79,7 +81,7 @@ def draw_dashboard(out_string=None):
 
 
 def update():
-    url = "http://127.0.0.1:{}/admin/api.php".format(PIHOLE_PORT)
+    url = "http://127.0.0.1:{}/admin/api.php?summary&auth={}".format(PIHOLE_PORT, PIHOLE_APITOKEN)
     r = json.load(urllib.request.urlopen(url))
 
     try:
