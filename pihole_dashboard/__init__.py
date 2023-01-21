@@ -33,6 +33,7 @@ if os.geteuid() != 0:
     sys.exit("You need root permissions to access E-Ink display, try running with sudo!")
 
 INTERFACE = "wlan0"
+PIHOLE_IP = "127.0.0.1"
 PIHOLE_PORT = 80
 PIHOLE_APITOKEN = ""
 IS_ROTATED = 0
@@ -45,6 +46,7 @@ CONFIG_FILENAME = "/etc/pihole-dashboard/config.toml"
 try:
     CONFIG = toml.load(CONFIG_FILENAME, _dict=dict)
     INTERFACE = CONFIG["interface"]
+    PIHOLE_IP = CONFIG["pihole_ip"]
     PIHOLE_PORT = CONFIG["pihole_port"]
     PIHOLE_APITOKEN = CONFIG["pihole_api_token"]
     IS_ROTATED = CONFIG["is_rotated"]
@@ -96,7 +98,7 @@ def draw_dashboard(out_string=None):
 
 
 def update():
-    url = "http://127.0.0.1:{}/admin/api.php?summary&auth={}".format(PIHOLE_PORT, PIHOLE_APITOKEN)
+    url = "http://{}:{}/admin/api.php?summary&auth={}".format(PIHOLE_IP, PIHOLE_PORT, PIHOLE_APITOKEN)
     r = json.load(urllib.request.urlopen(url))
 
     try:

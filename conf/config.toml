@@ -6,6 +6,9 @@ interface = "wlan0"
 # Pi-hole lighttpd web admin port. Default is 80
 pihole_port = 80
 
+# Pi-hole IP. Useful when monitor remote pi-hole server. Default 127.0.0.1 (localhost)
+pihole_ip = "127.0.0.1"
+
 # Pi-hole api token.
 # To get api token, go to web admin page, see Settings -> API -> Show API token
 # Or run "grep WEBPASSWORD /etc/pihole/setupVars.conf" and get the string after "="
