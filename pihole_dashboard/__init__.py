@@ -37,6 +37,7 @@ PIHOLE_IP = "127.0.0.1"
 PIHOLE_PORT = 80
 PIHOLE_APITOKEN = ""
 IS_ROTATED = 0
+SCREEN_TYPE = "213v2"
 
 OUTPUT_STRING = ""
 LOG_FILENAME = "/tmp/.pihole-dashboard-output"
@@ -60,9 +61,12 @@ font_name = os.path.join(font_dir, "font.ttf")
 font16 = ImageFont.truetype(font_name, 16)
 font12 = ImageFont.truetype(font_name, 12)
 
-epd = epd2in13_V2.EPD()
-epd.init(epd.FULL_UPDATE)
-
+if SCREEN_TYPE is "213v2":
+  from waveshare_epd import epd2in13_V2
+  epd = epd2in13_V2.EPD()
+  epd.init(epd.FULL_UPDATE)
+elif SCREEN_TYPE is "213v3":
+  print("Working in progress...")
 
 def valid_ip(address):
     try:
