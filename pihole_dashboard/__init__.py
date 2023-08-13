@@ -40,7 +40,7 @@ IS_ROTATED = 0
 SCREEN_TYPE = "213v2"
 
 OUTPUT_STRING = ""
-LOG_FILENAME = "/tmp/.pihole-dashboard-output"
+DISPHASH_FILENAME = "/tmp/.pihole-dashboard-output"
 CONFIG_FILENAME = "/etc/pihole-dashboard/config.toml"
 
 # Read config file
@@ -62,14 +62,17 @@ font_name = os.path.join(font_dir, "font.ttf")
 font16 = ImageFont.truetype(font_name, 16)
 font12 = ImageFont.truetype(font_name, 12)
 
-if SCREEN_TYPE is "213v2":
+# Determine display type and clear
+if SCREEN_TYPE == "213v2":
   from waveshare_epd import epd2in13_V2
   epd = epd2in13_V2.EPD()
   epd.init(epd.FULL_UPDATE)
-elif SCREEN_TYPE is "213v3":
+elif SCREEN_TYPE == "213v3":
   from waveshare_epd import epd2in13_V3
   epd = epd2in13_V3.EPD()
   epd.init()
+  epd.Clear(0xFF)
+
 
 def valid_ip(address):
     try:
@@ -80,7 +83,7 @@ def valid_ip(address):
 
 
 def draw_dashboard(out_string=None):
-
+    # Draw a white canvas
     image = Image.new("1", (epd.height, epd.width), 255)
     draw = ImageDraw.Draw(image)
 
@@ -94,6 +97,7 @@ def draw_dashboard(out_string=None):
     output = process.stdout.read().decode().split('\n')
     version = output[0].split("(")[0].strip()
 
+    # Draw frame & text
     draw.rectangle([(0, 105), (250, 122)], fill=0)
     if out_string is not None:
         draw.text((0, 0), out_string, font=font16, fill=0)
@@ -111,7 +115,7 @@ def update():
     try:
         ip = ni.ifaddresses(INTERFACE)[ni.AF_INET][0]['addr']
     except KeyError:
-        ip_str = "[×] Can't connect to Wi-Fi"
+        ip_str = "[×] Can't get IP address"
         ip = ""
 
     if "unique_clients" not in r:
@@ -136,11 +140,11 @@ def update():
 
     hash_string = hashlib.sha1(OUTPUT_STRING.encode('utf-8')).hexdigest()
     try:
-        hash_file = open(LOG_FILENAME, "r+")
+        hash_file = open(DISPHASH_FILENAME, "r+")
 
     except FileNotFoundError:
-        os.mknod(LOG_FILENAME)
-        hash_file = open(LOG_FILENAME, "r+")
+        os.mknod(DISPHASH_FILENAME)
+        hash_file = open(DISPHASH_FILENAME, "r+")
 
     file_string = hash_file.read()
     if file_string != hash_string:
