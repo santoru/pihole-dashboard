@@ -27,7 +27,6 @@ import sys
 import toml
 import hashlib
 import netifaces as ni
-from waveshare_epd import epd2in13_V2
 from PIL import Image, ImageFont, ImageDraw
 
 if os.geteuid() != 0:
@@ -40,7 +39,7 @@ PIHOLE_APITOKEN = ""
 IS_ROTATED = 0
 
 OUTPUT_STRING = ""
-FILENAME = "/tmp/.pihole-dashboard-output"
+LOG_FILENAME = "/tmp/.pihole-dashboard-output"
 CONFIG_FILENAME = "/etc/pihole-dashboard/config.toml"
 
 # Read config file
@@ -130,11 +129,11 @@ def update():
 
     hash_string = hashlib.sha1(OUTPUT_STRING.encode('utf-8')).hexdigest()
     try:
-        hash_file = open(FILENAME, "r+")
+        hash_file = open(LOG_FILENAME, "r+")
 
     except FileNotFoundError:
-        os.mknod(FILENAME)
-        hash_file = open(FILENAME, "r+")
+        os.mknod(LOG_FILENAME)
+        hash_file = open(LOG_FILENAME, "r+")
 
     file_string = hash_file.read()
     if file_string != hash_string:
