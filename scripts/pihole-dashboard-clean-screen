@@ -2,6 +2,7 @@
 
 # pihole-dashboard-clean-screen
 # Copyright (C) 2021  santoru
+# Copyright (C) 2023  ameneko
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,22 +20,37 @@
 import time
 import sys
 import os
-from waveshare_epd import epd2in13_V2
+import toml
 from PIL import Image, ImageFont, ImageDraw
 
-FILENAME = "/tmp/.pihole-dashboard-output"
-
+DISPHASH_FILENAME = "/tmp/.pihole-dashboard-output"
+CONFIG_FILENAME = "/etc/pihole-dashboard/config.toml"
 
 if __name__ == '__main__':
     if os.geteuid() != 0:
         sys.exit("You need root permissions to access E-Ink display, try running with sudo!")
     try:
-        os.remove(FILENAME)
+        os.remove(DISPHASH_FILENAME)
     except FileNotFoundError:
         pass
 
-    os.mknod(FILENAME)
+    os.mknod(DISPHASH_FILENAME)
 
-    epd = epd2in13_V2.EPD()
-    epd.init(epd.FULL_UPDATE)
-    epd.Clear(0xFF)
+    try:
+      CONFIG = toml.load(CONFIG_FILENAME, _dict=dict)
+      SCREEN_TYPE = CONFIG["screen_type"]
+    except TomlDecodeError:
+      output_error = "Config can't be parsed! Please check config file."
+      sys.exit(output_error)
+
+
+    if SCREEN_TYPE == "213v2":
+      from waveshare_epd import epd2in13_V2
+      epd = epd2in13_V2.EPD()
+      epd.init(epd.FULL_UPDATE)
+    elif SCREEN_TYPE == "213v3":
+      from waveshare_epd import epd2in13_V3
+      epd = epd2in13_V3.EPD()
+      epd.init()
+      epd.Clear(0xFF)
+

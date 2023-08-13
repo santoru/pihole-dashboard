@@ -1,3 +1,4 @@
 waveshare-epd
 netifaces>=0.10.9
 Pillow>=8.2.0
+toml>=0.10.2

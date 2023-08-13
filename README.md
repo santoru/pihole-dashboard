@@ -17,9 +17,10 @@ Additionally, I do not use static IP so if this ever change, I have an easy way 
 - <a href="https://pi-hole.net/">Pi-Hole</a> (I have v5.2.4 at the moment)
 
 ## Configuration
-The tool should run out of the box with standard installation of Pi-Hole. If you have a different setup probably the scripts should be adapted too.\
-If your instance of Pi-Hole is running on a different port than 80, you should change it inside `pihole_dashboard/__init__.py`.\
-The IP address is shown considering the `wlan0` interface, you can change this value from `pihole_dashboard/__init__.py`.
+After set the webui api token, the tool should run out of the box with standard installation of Pi-Hole.\
+You can find your API in Pi-Hole's webpage: Settings - API - Show API token - Yes, show API token. Then, RAW API Token is the token.\
+If your instance of Pi-Hole is running on a different port than 80, you should change it inside `/etc/pihole-dashboard/config.toml`.\
+The IP address is shown considering the `wlan0` interface, you can change this value in `/etc/pihole-dashboard/config.toml`.
 
 ### WaveShare e-Paper dependency
 Making the E-Ink display work is not fully covered here, as it depends mostly on the display you use. As said before, I have the WaveShare's 2.13 inch E-Ink display, that has a nice detailed Wiki here: https://www.waveshare.com/wiki/2.13inch_e-Paper_HAT.
@@ -37,11 +38,15 @@ git clone https://github.com/waveshare/e-Paper.git
 cd e-Paper/RaspberryPi_JetsonNano/python/
 sudo python3 setup.py install
 ```
+
 You can check if the display is working by running the test example:
 ```bash
 cd e-Paper/RaspberryPi_JetsonNano/python/
 sudo python3 examples/epd_2in13_V2_test.py
 ```
+Test script depends on your screen type. There should be a sticker which tells your screen type.
+If yours is a newer V3, before run the test, your should change V2 to V3.
+
 Remember that you need **root** access to control the display, so be sure to run the python example as root.\
 You also need to [enable the SPI interface](https://www.raspberrypi.org/documentation/hardware/raspberrypi/spi/README.md#software), otherwise the display connection will not work.
 
@@ -66,16 +71,18 @@ git clone https://github.com/santoru/pihole-dashboard
 cd pihole-dashboard
 sudo pip3 install .
 ```
-Once installed, reboot the Raspberry Pi. The dashboard should appear few minutes after the reboot.
+Once installed, **Add API key to your config file, change screen type if needed** (at `/etc/pihole-dashboard/config.toml`), then reboot the Raspberry Pi. 
+The dashboard should appear few minutes after the reboot.
 
 ## Uninstall
 You can remove the tool anytime by running
 ```bash
 sudo pip uninstall pihole-dashboard
 ```
-You can also manually remove the cronjob by running
+You can also manually remove the cronjob and config file by running
 ```bash
 sudo rm /etc/cron.d/pihole-dashboard-cron
+sudo rm -rf /etc/pihole-dashboard/
 ```
 
 ## How it works

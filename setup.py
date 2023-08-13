@@ -28,6 +28,14 @@ class PostInstallJob(install):
         cron_dir = os.path.join(self_dir, 'cron')
         copyfile(os.path.join(cron_dir, "pihole-dashboard-cron"),
                  "/etc/cron.d/pihole-dashboard-cron")
+        print("Installing config file...")
+        self_dir = os.path.dirname(os.path.realpath(__file__))
+        conf_dir = os.path.join(self_dir, 'conf')
+        conf_sys_dir = "/etc/pihole-dashboard"
+        if not os.path.exists(conf_sys_dir):
+            os.makedirs(conf_sys_dir)
+        copyfile(os.path.join(conf_dir, "config.toml"),
+                 "/etc/pihole-dashboard/config.toml")
         print("Done.")
 
 

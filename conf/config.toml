@@ -1,0 +1,24 @@
+# Configuration file for pihole-dashboard
+
+# Interface to parse ip address. Default is wlan0
+interface = "wlan0"
+
+# Pi-hole lighttpd web admin port. Default is 80
+pihole_port = 80
+
+# Pi-hole IP. Useful when monitor remote pi-hole server. Default 127.0.0.1 (localhost)
+pihole_ip = "127.0.0.1"
+
+# Pi-hole api token.
+# To get api token, go to web admin page, see Settings -> API -> Show API token
+# Or run "grep WEBPASSWORD /etc/pihole/setupVars.conf" and get the string after "="
+# https://github.com/pi-hole/AdminLTE/issues/2467
+pihole_api_token = ""
+
+# Rotate indicator, set 1 for 180 degrees rotation. Default is 0
+is_rotated = 0
+
+# Screen selection. Supported screens:
+# 213v2 | Waveshare 2.13 BW V2
+# 213v3 | Waveshare 2.13 BW V3
+screen_type = "213v2"
