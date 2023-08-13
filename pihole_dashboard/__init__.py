@@ -51,6 +51,7 @@ try:
     PIHOLE_PORT = CONFIG["pihole_port"]
     PIHOLE_APITOKEN = CONFIG["pihole_api_token"]
     IS_ROTATED = CONFIG["is_rotated"]
+    SCREEN_TYPE = CONFIG["screen_type"]
 except TomlDecodeError:
     output_error = "Config can't be parsed! Please check config file."
     sys.exit(output_error)
@@ -66,7 +67,9 @@ if SCREEN_TYPE is "213v2":
   epd = epd2in13_V2.EPD()
   epd.init(epd.FULL_UPDATE)
 elif SCREEN_TYPE is "213v3":
-  print("Working in progress...")
+  from waveshare_epd import epd2in13_V3
+  epd = epd2in13_V3.EPD()
+  epd.init()
 
 def valid_ip(address):
     try:
