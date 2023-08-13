@@ -18,6 +18,7 @@ Additionally, I do not use static IP so if this ever change, I have an easy way 
 
 ## Configuration
 After set the webui api token, the tool should run out of the box with standard installation of Pi-Hole.\
+You can find your API in Pi-Hole's webpage: Settings - API - Show API token - Yes, show API token. Then, RAW API Token is the token.\
 If your instance of Pi-Hole is running on a different port than 80, you should change it inside `/etc/pihole-dashboard/config.toml`.\
 The IP address is shown considering the `wlan0` interface, you can change this value in `/etc/pihole-dashboard/config.toml`.
 
