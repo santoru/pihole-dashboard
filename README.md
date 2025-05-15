@@ -14,12 +14,21 @@ Additionally, I do not use static IP so if this ever change, I have an easy way 
 ## My Setup
 - Raspberry Pi Zero WH (You can also solder the headers by yourself)
 - <a href="https://www.waveshare.com/2.13inch-e-paper-hat.htm">2.13 inch E-Ink display HAT for Raspberry Pi</a>
-- <a href="https://pi-hole.net/">Pi-Hole</a> (I have v5.2.4 at the moment)
+- <a href="https://pi-hole.net/">Pi-Hole</a> (v5.x or v6.x compatible)
+
+## Pi-hole v6 Compatibility
+Version 2.0.0 of this dashboard is compatible with Pi-hole v6.x which features a completely redesigned REST API. The dashboard now uses the new API endpoints to fetch the required data. If you're upgrading from a previous version of this dashboard that was used with Pi-hole v5.x, please update your configuration file to use a password instead of an API token.
+
+For detailed changes between versions, please see the [CHANGELOG.md](CHANGELOG.md) file.
 
 ## Configuration
-After set the webui api token, the tool should run out of the box with standard installation of Pi-Hole.\
-You can find your API in Pi-Hole's webpage: Settings - API - Show API token - Yes, show API token. Then, RAW API Token is the token.\
-If your instance of Pi-Hole is running on a different port than 80, you should change it inside `/etc/pihole-dashboard/config.toml`.\
+After set the admin password, the tool should run out of the box with standard installation of Pi-Hole.
+
+For Pi-hole v6:
+- Set your Pi-hole password in `/etc/pihole-dashboard/config.toml`
+- If your Pi-hole has local API authentication disabled, you can leave the password empty
+
+If your instance of Pi-Hole is running on a different port than 80, you should change it inside `/etc/pihole-dashboard/config.toml`.
 The IP address is shown considering the `wlan0` interface, you can change this value in `/etc/pihole-dashboard/config.toml`.
 
 ### WaveShare e-Paper dependency
@@ -71,7 +80,7 @@ git clone https://github.com/santoru/pihole-dashboard
 cd pihole-dashboard
 sudo pip3 install .
 ```
-Once installed, **Add API key to your config file, change screen type if needed** (at `/etc/pihole-dashboard/config.toml`), then reboot the Raspberry Pi. 
+Once installed, **Add your Pi-hole password to your config file, change screen type if needed** (at `/etc/pihole-dashboard/config.toml`), then reboot the Raspberry Pi. 
 The dashboard should appear few minutes after the reboot.
 
 ## Uninstall
@@ -89,9 +98,68 @@ sudo rm -rf /etc/pihole-dashboard/
 The tool will install a Cron Job on the Raspberry Pi that will check the status of Pi-Hole every minute. If there's an update to display, the screen will refresh and update its content.
 
 ## Troubleshooting
-If the dashboard is not displaying, you can check if the script return an error by running
+If the dashboard is not displaying, you can check if the script returns any errors by running:
 ```bash
 sudo pihole-dashboard-draw
 ```
-If everything is working as expected, nothing will be printed out.
+
+### Diagnostic Commands
+
+For more detailed diagnostics, the dashboard provides several troubleshooting options:
+
+#### Verbose Mode
+Shows configuration and API endpoints:
+```bash
+sudo pihole-dashboard-draw -v
+```
+
+This displays:
+- Configuration file location
+- Current settings (interface, Pi-hole IP/port, screen type, etc.)
+- API endpoints being used
+- Connection and authentication test results
+- Execution status
+
+#### Connection Testing
+Test API connections and authentication without updating the display:
+```bash
+sudo pihole-dashboard-draw -t
+```
+
+This is particularly useful for diagnosing 401 Unauthorized errors. It will:
+- Test basic connectivity to Pi-hole
+- Test authentication with the configured password
+- Test API access with proper authentication
+- Show helpful error messages and suggested fixes
+
+#### Debug Mode
+For advanced troubleshooting with full API response details:
+```bash
+sudo pihole-dashboard-draw -d
+```
+
+Combine with test mode for maximum diagnostic information:
+```bash
+sudo pihole-dashboard-draw -t -d
+```
+
+#### Version Check
+```bash
+sudo pihole-dashboard-draw --version
+```
+
+### Common Issues and Solutions
+
+#### 401 Unauthorized Errors
+If you see 401 errors in test mode:
+- Ensure the password in `/etc/pihole-dashboard/config.toml` matches your Pi-hole password
+- If you've just upgraded to Pi-hole v6, you need to update from API token to password
+- For authentication-free local access, verify that local API authentication is disabled in Pi-hole settings
+
+#### Connection Errors
+- Verify Pi-hole is running: `systemctl status pihole-FTL`
+- Check IP and port settings in the configuration file
+- Ensure your network allows connections to the Pi-hole server
+
+If everything is working as expected with the default command, nothing will be printed out.
 If you still have errors, please open an issue.
