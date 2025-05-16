@@ -56,7 +56,7 @@ if __name__ == "__main__":
             "scripts/pihole-dashboard-draw"
         ],
         python_requires='>=3.3.5',
-        install_requires=parse_requirements(os.path.join(os.path.dirname(__file__), "requirements.txt"),
+        install_requires=parse_requirements(os.path.join(os.path.dirname(__file__), "requirements.txt")),
         cmdclass={
             'install': PostInstallJob,
         },
