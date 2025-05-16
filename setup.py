@@ -56,7 +56,12 @@ if __name__ == "__main__":
             "scripts/pihole-dashboard-draw"
         ],
         python_requires='>=3.3.5',
-        install_requires=parse_requirements(os.path.join(os.path.dirname(__file__), ".github/workflows/requirements.txt")),
+        install_requires=[
+            "waveshare-epd",
+            "netifaces>=0.10.9",
+            "Pillow>=8.2.0",
+            "toml>=0.10.2"
+        ],
         cmdclass={
             'install': PostInstallJob,
         },
