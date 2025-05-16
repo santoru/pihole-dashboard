@@ -2,6 +2,7 @@
 
 # pihole-dashboard-draw
 # Copyright (C) 2021-2023  santoru
+# Copyright (C) 2025  bestbug
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,8 +17,227 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
+import urllib.request
+import urllib.error
+import json
 import pihole_dashboard
+import argparse
+
+
+def test_api_endpoints(debug=False):
+    """Test API endpoints to diagnose connection/auth issues"""
+    conn_result = False
+    auth_result = False
+    summary_result = False
+    
+    # Test connection to Pi-hole
+    try:
+        print(f"\n🔍 Testing connection to Pi-hole at {pihole_dashboard.PIHOLE_IP}:{pihole_dashboard.PIHOLE_PORT}...")
+        try:
+            conn = urllib.request.urlopen(f"http://{pihole_dashboard.PIHOLE_IP}:{pihole_dashboard.PIHOLE_PORT}/", timeout=5)
+            print(f"✓ Connected to Pi-hole: Status {conn.status}")
+            conn_result = True
+        except urllib.error.HTTPError as e:
+            if e.code == 403:
+                # Pi-hole v6 often returns 403 for the root URL, but API endpoints still work
+                print("✓ Pi-hole responded (with 403 Forbidden)")
+                print("  This is normal for Pi-hole v6 - API endpoints will still be accessible with authentication")
+                conn_result = True
+            else:
+                raise
+    except Exception as e:
+        print(f"✗ Failed to connect to Pi-hole: {str(e)}")
+        print("  - Check if Pi-hole is running and accessible")
+        print(f"  - Verify IP ({pihole_dashboard.PIHOLE_IP}) and port ({pihole_dashboard.PIHOLE_PORT}) settings")
+    
+    # Test authentication and get a session ID
+    sid = None
+    if pihole_dashboard.PIHOLE_PASSWORD:
+        print("\n🔍 Testing authentication with provided password...")
+        try:
+            auth_url = f"http://{pihole_dashboard.PIHOLE_IP}:{pihole_dashboard.PIHOLE_PORT}/api/auth"
+            auth_data = json.dumps({"password": pihole_dashboard.PIHOLE_PASSWORD}).encode('utf-8')
+            request = urllib.request.Request(
+                auth_url, 
+                data=auth_data,
+                headers={'Content-Type': 'application/json'}
+            )
+            response = urllib.request.urlopen(request)
+            result = json.load(response)
+            
+            # Check for session ID in different response structures
+            if 'session' in result and 'sid' in result['session']:
+                sid = result['session']['sid']
+                print("✓ Authentication successful! (Pi-hole v6 response format)")
+                auth_result = True
+                
+                # Check for CSRF token
+                csrf = None
+                if 'csrf' in result['session']:
+                    csrf = result['session']['csrf']
+                    print("  CSRF token found - will include in API requests")
+            elif 'sid' in result:
+                sid = result['sid']
+                print("✓ Authentication successful! (Standard response format)")
+                auth_result = True
+                
+            if sid:
+                print(f"  Session ID obtained: {sid[:10]}..." if debug else "  Session ID obtained")
+            else:
+                print("✗ Authentication response did not contain a session ID")
+                print(f"  Response: {json.dumps(result)}")
+                
+            # Store response for debugging
+            auth_response = result
+        except urllib.error.HTTPError as e:
+            print(f"✗ Authentication failed with HTTP error: {e.code} {e.reason}")
+            if e.code == 401:
+                print("  - Your password is incorrect")
+                print("  - Check /etc/pihole-dashboard/config.toml and verify the password")
+            try:
+                error_body = json.loads(e.read().decode())
+                print(f"  Error details: {json.dumps(error_body)}" if debug else "  Use --debug for error details")
+            except:
+                pass
+        except Exception as e:
+            print(f"✗ Authentication error: {str(e)}")
+    else:
+        print("\n🔍 No password set. Testing if local API authentication is disabled...")
+        try:
+            summary_url = f"http://{pihole_dashboard.PIHOLE_IP}:{pihole_dashboard.PIHOLE_PORT}/api/stats/summary"
+            request = urllib.request.Request(summary_url)
+            response = urllib.request.urlopen(request)
+            result = json.load(response)
+            print("✓ Accessed API without authentication - local API auth is correctly disabled")
+            auth_result = True
+        except urllib.error.HTTPError as e:
+            print(f"✗ Failed to access API without authentication: {e.code} {e.reason}")
+            if e.code == 401:
+                print("  - Pi-hole requires authentication, but no password was provided")
+                print("  - Add your Pi-hole password to /etc/pihole-dashboard/config.toml")
+            try:
+                error_body = json.loads(e.read().decode())
+                print(f"  Error details: {json.dumps(error_body)}" if debug else "  Use --debug for error details")
+            except:
+                pass
+        except Exception as e:
+            print(f"✗ Error testing API access: {str(e)}")
+    
+    # Test summary API
+    print("\n🔍 Testing access to summary API...")
+    try:
+        # Always try the summary API test, even if previous tests failed
+        # This gives more diagnostic information
+        headers = {}
+        if sid:
+            headers['sid'] = sid
+            headers['Cookie'] = f'sid={sid}'
+            
+            # Include CSRF token if found during authentication
+            if 'auth_response' in locals() and 'session' in auth_response and 'csrf' in auth_response['session']:
+                csrf = auth_response['session']['csrf']
+                headers['X-CSRF-Token'] = csrf
+                print(f"  Including CSRF token: {csrf[:10]}..." if debug else "  Including CSRF token in request")
+            
+            print(f"  Setting session ID in headers and cookie: {sid[:10]}..." if debug else "  Setting session ID in headers and cookie")
+        
+        summary_url = f"http://{pihole_dashboard.PIHOLE_IP}:{pihole_dashboard.PIHOLE_PORT}/api/stats/summary"
+        request = urllib.request.Request(summary_url, headers=headers)
+        response = urllib.request.urlopen(request)
+        result = json.load(response)
+        print("✓ Successfully accessed summary API")
+        print(f"  Data received: {json.dumps(result)}" if debug else "  Use --debug to see the data")
+        summary_result = True
+    except urllib.error.HTTPError as e:
+        print(f"✗ Failed to access summary API: {e.code} {e.reason}")
+        if e.code == 401:
+            print("  - Authentication failed. The session ID might not be valid or accepted")
+            print("  - Pi-hole v6 may require additional headers or a different authentication method")
+            print("  - Try checking the Pi-hole documentation for API authentication requirements")
+        try:
+            error_body = json.loads(e.read().decode())
+            print(f"  Error details: {json.dumps(error_body)}" if debug else "  Use --debug for error details")
+        except:
+            pass
+    except Exception as e:
+        print(f"✗ Error accessing summary API: {str(e)}")
+    
+    # Test status API if summary API succeeded
+    if summary_result:
+        print("\n🔍 Testing access to status API...")
+        try:
+            status_url = f"http://{pihole_dashboard.PIHOLE_IP}:{pihole_dashboard.PIHOLE_PORT}/api/dns/blocking"
+            request = urllib.request.Request(status_url, headers=headers)
+            response = urllib.request.urlopen(request)
+            result = json.load(response)
+            print("✓ Successfully accessed status API")
+            print(f"  Pi-hole blocking is: {'enabled' if result.get('blocking', False) else 'disabled'}")
+            return True
+        except urllib.error.HTTPError as e:
+            print(f"✗ Failed to access status API: {e.code} {e.reason}")
+            try:
+                error_body = json.loads(e.read().decode())
+                print(f"  Error details: {json.dumps(error_body)}" if debug else "  Use --debug for error details")
+            except:
+                pass
+        except Exception as e:
+            print(f"✗ Error accessing status API: {str(e)}")
+    
+    return summary_result
+
+
+def verbose_update(debug=False):
+    """Run update with verbose output showing configuration details."""
+    print("✓ Using Pi-hole Dashboard version 2.0.0")
+    print(f"✓ Configuration file: {pihole_dashboard.CONFIG_FILENAME}")
+    print("\nConfiguration Settings:")
+    print(f"  - Interface: {pihole_dashboard.INTERFACE}")
+    print(f"  - Pi-hole IP: {pihole_dashboard.PIHOLE_IP}")
+    print(f"  - Pi-hole Port: {pihole_dashboard.PIHOLE_PORT}")
+    print(f"  - Password set: {'Yes' if pihole_dashboard.PIHOLE_PASSWORD else 'No'}")
+    print(f"  - Screen Type: {pihole_dashboard.SCREEN_TYPE}")
+    print(f"  - Screen Rotation: {'180°' if pihole_dashboard.IS_ROTATED == 1 else 'None'}")
+    
+    print("\nAPI Endpoints:")
+    print(f"  - Auth API: http://{pihole_dashboard.PIHOLE_IP}:{pihole_dashboard.PIHOLE_PORT}/api/auth")
+    print(f"  - Summary API: http://{pihole_dashboard.PIHOLE_IP}:{pihole_dashboard.PIHOLE_PORT}/api/stats/summary")
+    print(f"  - Status API: http://{pihole_dashboard.PIHOLE_IP}:{pihole_dashboard.PIHOLE_PORT}/api/dns/blocking")
+    
+    if test_api_endpoints(debug):
+        print("\nAll tests passed. Running update...")
+        try:
+            pihole_dashboard.update()
+            print("✓ Dashboard updated successfully!")
+        except Exception as e:
+            print(f"✗ Error updating dashboard: {str(e)}")
+            if debug:
+                import traceback
+                traceback.print_exc()
+    else:
+        print("\n✗ Some tests failed. Please fix the issues before continuing.")
+        print("  Review the diagnostic information above.")
 
 
 if __name__ == '__main__':
-    pihole_dashboard.update()
+    parser = argparse.ArgumentParser(description='Pi-hole Dashboard E-Ink Display Tool')
+    parser.add_argument('-v', '--verbose', action='store_true', 
+                        help='Show configuration details and API endpoints')
+    parser.add_argument('-d', '--debug', action='store_true',
+                        help='Show detailed debug information including full API responses')
+    parser.add_argument('-t', '--test', action='store_true',
+                        help='Test API connections and auth without updating the display')
+    parser.add_argument('--version', action='version', version='Pi-hole Dashboard 2.0.0')
+    
+    args = parser.parse_args()
+    
+    if args.test:
+        test_api_endpoints(args.debug)
+    elif args.verbose or args.debug:
+        verbose_update(args.debug)
+    else:
+        try:
+            pihole_dashboard.update()
+        except Exception as e:
+            print(f"Error: {str(e)}")
+            print("Run with -v or --verbose for more diagnostic information")

@@ -7,7 +7,7 @@ from setuptools import setup
 from setuptools.command.install import install
 
 PACKAGE_NAME = "pihole-dashboard"
-VERSION = "1.0.3"
+VERSION = "2.0.0"  # Updated for Pi-hole v6 compatibility
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
@@ -45,7 +45,7 @@ if __name__ == "__main__":
         version=VERSION,
         author="santoru",
         author_email="santoru@pm.me",
-        description="Minimal dashboard for Pi-Hole that works with WaveShare's 2.13 inch HAT display",
+        description="Minimal dashboard for Pi-Hole that works with WaveShare's 2.13 inch HAT display (v6 compatible)",
         long_description=long_description,
         long_description_content_type="text/markdown",
         url="https://github.com/santoru/pihole-dashboard",

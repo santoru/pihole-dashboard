@@ -3,17 +3,17 @@
 # Interface to parse ip address. Default is wlan0
 interface = "wlan0"
 
-# Pi-hole lighttpd web admin port. Default is 80
+# Pi-hole web port. Default is 80
 pihole_port = 80
 
 # Pi-hole IP. Useful when monitor remote pi-hole server. Default 127.0.0.1 (localhost)
 pihole_ip = "127.0.0.1"
 
-# Pi-hole api token.
-# To get api token, go to web admin page, see Settings -> API -> Show API token
-# Or run "grep WEBPASSWORD /etc/pihole/setupVars.conf" and get the string after "="
-# https://github.com/pi-hole/AdminLTE/issues/2467
-pihole_api_token = ""
+# Pi-hole password for authentication.
+# In Pi-hole v6, this is used to obtain a session token.
+# Set this to your Pi-hole admin password.
+# If your Pi-hole has local API auth disabled, you can leave this empty.
+pihole_password = ""
 
 # Rotate indicator, set 1 for 180 degrees rotation. Default is 0
 is_rotated = 0
