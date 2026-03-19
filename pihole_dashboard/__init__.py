@@ -74,6 +74,11 @@ elif SCREEN_TYPE == "213v3":
   epd = epd2in13_V3.EPD()
   epd.init()
   epd.Clear(0xFF)
+elif SCREEN_TYPE == "213v4":
+  from waveshare_epd import epd2in13_V4
+  epd = epd2in13_V4.EPD()
+  epd.init()
+  epd.Clear(0xFF)
 
 
 def valid_ip(address):

@@ -21,4 +21,5 @@ is_rotated = 0
 # Screen selection. Supported screens:
 # 213v2 | Waveshare 2.13 BW V2
 # 213v3 | Waveshare 2.13 BW V3
+# 213v4 | Waveshare 2.13 BW V4
 screen_type = "213v2"
