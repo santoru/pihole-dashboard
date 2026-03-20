@@ -1,1 +1,2 @@
 include cron/pihole-dashboard-cron
+include conf/config.toml
