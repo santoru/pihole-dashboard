@@ -7,7 +7,7 @@ from setuptools import setup
 from setuptools.command.install import install
 
 PACKAGE_NAME = "pihole-dashboard"
-VERSION = "2.0.9"  # Updated for Pi-hole v6 compatibility
+VERSION = "2.0.10"  # Updated for Pi-hole v6 compatibility
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
